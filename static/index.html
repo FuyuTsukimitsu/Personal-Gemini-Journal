@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Personal Gemini Journal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,500;0,8..60,600;1,8..60,400;1,8..60,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+
+  <!-- Signed-out state -->
+  <main id="landing" class="landing">
+    <div class="landing-glow" aria-hidden="true"></div>
+    <div class="landing-inner">
+      <p class="landing-kicker">Personal Gemini Journal</p>
+      <div class="landing-rule" aria-hidden="true"></div>
+      <h1 class="landing-title">A quiet place to write,<br />and something that writes back.</h1>
+      <p class="landing-body">
+        Keep a private, ongoing journal. Gemini reads each entry and offers a
+        reflection, a reframe, or a question worth sitting with — never
+        clinical, never shared with anyone else.
+      </p>
+      <button id="sign-in-btn" class="btn-google">
+        <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true">
+          <path fill="#4285F4" d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84a4.14 4.14 0 0 1-1.8 2.72v2.26h2.9c1.7-1.57 2.7-3.88 2.7-6.62z"/>
+          <path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.9-2.26c-.8.54-1.84.86-3.06.86-2.35 0-4.34-1.59-5.05-3.72H.98v2.33A9 9 0 0 0 9 18z"/>
+          <path fill="#FBBC05" d="M3.95 10.7A5.4 5.4 0 0 1 3.67 9c0-.59.1-1.17.28-1.7V4.97H.98A9 9 0 0 0 0 9c0 1.45.35 2.83.98 4.03l2.97-2.33z"/>
+          <path fill="#EA4335" d="M9 3.58c1.32 0 2.5.45 3.44 1.35l2.58-2.58C13.46.89 11.43 0 9 0A9 9 0 0 0 .98 4.97L3.95 7.3C4.66 5.17 6.65 3.58 9 3.58z"/>
+        </svg>
+        Sign in with Google
+      </button>
+      <p id="landing-error" class="landing-error" hidden></p>
+    </div>
+  </main>
+
+  <!-- Signed-in dashboard -->
+  <div id="app" class="app" hidden>
+    <button id="sidebar-toggle" class="sidebar-toggle" aria-label="Open entries menu">☰</button>
+    <div id="sidebar-backdrop" class="sidebar-backdrop"></div>
+
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-top">
+        <button id="sidebar-close" class="sidebar-close" aria-label="Close menu">✕</button>
+        <p class="brand">Personal Gemini Journal</p>
+        <button id="new-entry-btn" class="btn-new">New entry</button>
+        <button id="digest-btn" class="btn-secondary">This week's digest</button>
+        <input
+          id="search-input"
+          class="search-input"
+          type="search"
+          placeholder="Search entries…"
+        />
+      </div>
+
+      <nav id="session-list" class="session-list" aria-label="Past entries"></nav>
+
+      <div class="sidebar-bottom">
+        <img id="user-photo" class="user-photo" alt="" />
+        <div class="user-info">
+          <p id="user-name" class="user-name"></p>
+          <button id="export-btn" class="link-btn">Export journal</button>
+          <span class="dot">·</span>
+          <button id="sign-out-btn" class="link-btn">Sign out</button>
+        </div>
+      </div>
+    </aside>
+
+    <main class="entry-panel">
+      <div id="entry-empty" class="entry-empty">
+        <p>Select an entry on the left, or start a new one.</p>
+      </div>
+
+      <div id="on-this-day" class="on-this-day" hidden>
+        <p id="on-this-day-text"></p>
+        <button id="on-this-day-open" class="link-btn">Open it</button>
+      </div>
+
+      <div id="entry-view" class="entry-view" hidden>
+        <div class="entry-view-header">
+          <h2 id="entry-title" class="entry-title" title="Click to rename">Untitled entry</h2>
+          <div class="entry-view-actions">
+            <div id="mood-picker" class="mood-picker" aria-label="Set mood"></div>
+            <button id="summarize-btn" class="link-btn">Summarize this entry</button>
+            <button id="delete-btn" class="link-btn link-btn-danger">Delete entry</button>
+          </div>
+        </div>
+        <div id="entry-summary" class="entry-summary" hidden>
+          <div class="entry-summary-header">
+            <span class="entry-summary-label">Session summary</span>
+            <button id="summary-toggle" class="link-btn" type="button">Hide</button>
+          </div>
+          <p id="entry-summary-text" class="entry-summary-text"></p>
+        </div>
+
+        <div id="thread" class="thread"></div>
+
+        <form id="composer" class="composer">
+          <textarea
+            id="composer-input"
+            class="composer-input"
+            placeholder="Write what's on your mind…"
+            rows="3"
+          ></textarea>
+          <button type="submit" id="composer-send" class="btn-send">Send</button>
+        </form>
+      </div>
+
+      <div id="digest-view" class="entry-view" hidden>
+        <div class="entry-view-header">
+          <h2 class="entry-title">This week's digest</h2>
+        </div>
+        <div id="digest-content" class="digest-content"></div>
+      </div>
+    </main>
+  </div>
+
+  <script type="module" src="/static/app.js"></script>
+</body>
+</html>

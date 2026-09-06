@@ -1,0 +1,55 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Every document for a user lives under /users/{uid}/... . A user can
+    // only read or write their own subtree — this is what makes journal
+    // entries and summaries strictly per-user isolated.
+    match /users/{userId} {
+      allow read: if request.auth != null && request.auth.uid == userId;
+    }
+
+    match /users/{userId}/sessions/{sessionId} {
+      allow read: if request.auth != null && request.auth.uid == userId;
+
+      allow create: if request.auth != null
+        && request.auth.uid == userId
+        && request.resource.data.title is string
+        && request.resource.data.title.size() <= 200;
+
+      allow update: if request.auth != null
+        && request.auth.uid == userId
+        && (!("title" in request.resource.data) || request.resource.data.title is string)
+        && (!("mood" in request.resource.data)
+            || request.resource.data.mood in ["😊", "😐", "😔", "😤", "✨", null])
+        && (!("summary" in request.resource.data)
+            || request.resource.data.summary is string
+            || request.resource.data.summary == null);
+
+      allow delete: if request.auth != null && request.auth.uid == userId;
+    }
+
+    match /users/{userId}/sessions/{sessionId}/messages/{messageId} {
+      allow read: if request.auth != null && request.auth.uid == userId;
+
+      allow create: if request.auth != null
+        && request.auth.uid == userId
+        && request.resource.data.role in ["user", "model"]
+        && request.resource.data.content is string
+        && request.resource.data.content.size() <= 20000;
+
+      // Messages are append-only from the client's perspective — the
+      // backend is the only writer that should ever touch these after
+      // creation, and it uses its own service-account credentials
+      // (which bypass these rules entirely), so no update/delete rule
+      // is granted to end users here.
+    }
+
+    match /users/{userId}/digests/{digestId} {
+      allow read: if request.auth != null && request.auth.uid == userId;
+      // Digests are written only by the backend's service account,
+      // which bypasses Firestore security rules — no client write rule
+      // is needed or granted.
+    }
+  }
+}
